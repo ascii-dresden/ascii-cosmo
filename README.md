@@ -4,4 +4,5 @@ CoSMo is a triangular prism display to indicate the opening state of the student
 
 ## Concept
 
-[![Concept rendering of the mechanism](renderings/cosmo-concept.mp4)](renderings/cosmo-concept.mp4)
+https://github.com/ascii-dresden/ascii-cosmo/assets/23241150/d84b26b8-f957-41e1-8ddb-c8b940afc108
+
