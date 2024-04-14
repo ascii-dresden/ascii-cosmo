@@ -2,7 +2,8 @@ include <BOSL2/std.scad>
 include <gears/lego_gears.scad>
 
 prism_radius = 40;
-prism_height = 56;
+prism_height = 8 * 11;
+prism_axle_offset = 8 * 3;
 prism_size = 1.99;
 
 angle = 16.785;
@@ -24,8 +25,8 @@ c_inner_part = "#dddddd";
 c_axle = "#555555";
 
 ENABLE_INNER = false;
-ENABLE_ZIPPER = true;
-ENABLE_SIGN_INSET = false;
+ENABLE_ZIPPER = false;
+ENABLE_SIGN_INSET = true;
 ENABLE_SIGN = false;
 
 module outer_part_1() {
@@ -92,16 +93,16 @@ module sign(c) {
 }
 
 module sign_offset(c, row, col) {
-    scale = 0.22;
+    scale = 0.21;
 
     offset_x = col * -prism_edge_outer;
-    offset_y = row * -prism_height + prism_height / 2;
+    offset_y = (row + 0.5) * -prism_height + prism_height / 2;
 
     translate([offset_x, 0, offset_y])  translate([0, prism_edge_offset + prism_edge_height - 0.05, 0]) rotate([90, 0, 0]) scale([-scale, scale, -scale]) linear_extrude(height=prism_edge_height * 2 * 3) sign(c);
 }
 
 module prism_side(c, row, col) {
-    axle_offset = (prism_height / 2) - 12;
+    axle_offset = (prism_height / 2) - 4 - prism_axle_offset;
     scale = 0.09;
 
     if (ENABLE_SIGN_INSET) {
@@ -222,7 +223,7 @@ module prism(row, col) {
     }
 }
 
-// for ( row = [0:1:1]) for ( col = [-1:1:1]) prism(row, col);
+// for ( row = [0:1:0]) for ( col = [-1:1:1]) prism(row, col);
 
-prism_side_with_zipper(c_prism_r, 1, 0, false, true);
+prism_side_with_zipper(c_prism_g, 0, -1, false, false);
 // up(prism_height) prism_side_with_zipper(c_prism_g, 1, 0, false, true);
