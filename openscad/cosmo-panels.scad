@@ -147,7 +147,7 @@ module zack(c, heigth, width, offset) {
 
 module prism_side_with_zack(c, row, col, top_zack, bottom_zack) {
     offset_width = 0.005;
-    offset_depth = 0.01;
+    offset_depth = 0.02;
     offset_height = 0.02;
 
     if (ENABLE_ZACK) {
@@ -222,7 +222,7 @@ module prism(row, col) {
     }
 }
 
-for ( row = [0:1:1]) for ( col = [-1:1:1]) prism(row, col);
+// for ( row = [0:1:1]) for ( col = [-1:1:1]) prism(row, col);
 
-// prism_side_with_zack(c_prism_r, 1, 0, false, true);
+prism_side_with_zack(c_prism_r, 1, 0, false, true);
 // up(prism_height) prism_side_with_zack(c_prism_g, 1, 0, false, true);
