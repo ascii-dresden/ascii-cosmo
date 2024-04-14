@@ -24,9 +24,9 @@ c_inner_part = "#dddddd";
 c_axle = "#555555";
 
 ENABLE_INNER = false;
-ENABLE_ZACK = true;
-ENABLE_SIGN_INSET = true;
-ENABLE_SIGN = true;
+ENABLE_ZIPPER = true;
+ENABLE_SIGN_INSET = false;
+ENABLE_SIGN = false;
 
 module outer_part_1() {
     offset = 5.1;
@@ -135,7 +135,7 @@ module prism_side(c, row, col) {
 }
 
 
-module zack(c, heigth, width, offset) {
+module tooth(c, heigth, width, offset) {
     cube_size = 8;
     default_factor = prism_edge_height / cube_size / 2 * heigth;
     factor = default_factor * (1 - offset);
@@ -145,52 +145,52 @@ module zack(c, heigth, width, offset) {
     color(c) translate([0, prism_edge_offset+ prism_edge_height / 2 - factor_offset, prism_height / 2]) scale([1 * width, factor, 1]) translate([0, -cube_size / 2, 0]) cube(cube_size, center=true);
 }
 
-module prism_side_with_zack(c, row, col, top_zack, bottom_zack) {
+module prism_side_with_zipper(c, row, col, top_zipper, botton_zipper) {
     offset_width = 0.005;
     offset_depth = 0.02;
     offset_height = 0.02;
 
-    if (ENABLE_ZACK) {
+    if (ENABLE_ZIPPER) {
         difference() {
             union() {
                 difference() {
                     prism_side(c, row, col);
 
-                    if (top_zack) {
+                    if (top_zipper) {
                         translate([0, prism_edge_offset+ prism_edge_height / 2, prism_height / 2]) cube([prism_edge_outer * 1.1, prism_edge_height * 1.5, offset_height * 2], center=true);
                     }
-                    if (bottom_zack) {
+                    if (botton_zipper) {
                         translate([0, -prism_edge_offset - prism_edge_height / 2, prism_height / 2]) cube([prism_edge_outer * 1.1, prism_edge_height * 1.5, offset_height * 2], center=true);
                     }
                 }
 
-                if (top_zack) {
-                    translate([4, 0, -offset_height]) zack(c, 1, 1 - offset_width, offset_depth);
-                    translate([-12, 0, -offset_height]) zack(c, 1, 1 - offset_width, offset_depth);
-                    translate([20, 0, -offset_height]) zack(c, 1, 1 - offset_width, offset_depth);
-                    translate([-28, 0, -offset_height]) zack(c, 1, 1 - offset_width, offset_depth);
+                if (top_zipper) {
+                    translate([4, 0, -offset_height]) tooth(c, 1, 1 - offset_width, offset_depth);
+                    translate([-12, 0, -offset_height]) tooth(c, 1, 1 - offset_width, offset_depth);
+                    translate([20, 0, -offset_height]) tooth(c, 1, 1 - offset_width, offset_depth);
+                    translate([-28, 0, -offset_height]) tooth(c, 1, 1 - offset_width, offset_depth);
                 }
 
-                if (bottom_zack) {
-                    translate([-4, 0, -prism_height + offset_height]) zack(c, 1, 1 - offset_width, offset_depth);
-                    translate([12, 0, -prism_height + offset_height]) zack(c, 1, 1 - offset_width, offset_depth);
-                    translate([-20, 0, -prism_height + offset_height]) zack(c, 1, 1 - offset_width, offset_depth);
-                    translate([28, 0, -prism_height + offset_height]) zack(c, 1, 1 - offset_width, offset_depth);
+                if (botton_zipper) {
+                    translate([-4, 0, -prism_height + offset_height]) tooth(c, 1, 1 - offset_width, offset_depth);
+                    translate([12, 0, -prism_height + offset_height]) tooth(c, 1, 1 - offset_width, offset_depth);
+                    translate([-20, 0, -prism_height + offset_height]) tooth(c, 1, 1 - offset_width, offset_depth);
+                    translate([28, 0, -prism_height + offset_height]) tooth(c, 1, 1 - offset_width, offset_depth);
                 }
             }
 
-            if (top_zack) {
-                translate([-4, 0, 0]) zack(c, 1.2, 1 + offset_width, 0);
-                translate([12, 0, 0]) zack(c, 1.2, 1 + offset_width, 0);
-                translate([-20, 0, 0]) zack(c, 1.2, 1 + offset_width, 0);
-                translate([28, 0, 0]) zack(c, 1.2, 1 + offset_width, 0);
+            if (top_zipper) {
+                translate([-4, 0, 0]) tooth(c, 1.2, 1 + offset_width, 0);
+                translate([12, 0, 0]) tooth(c, 1.2, 1 + offset_width, 0);
+                translate([-20, 0, 0]) tooth(c, 1.2, 1 + offset_width, 0);
+                translate([28, 0, 0]) tooth(c, 1.2, 1 + offset_width, 0);
             }
 
-            if (bottom_zack) {
-                translate([4, 0, -prism_height]) zack(c, 1.2, 1 + offset_width, 0);
-                translate([-12, 0, -prism_height]) zack(c, 1.2, 1 + offset_width, 0);
-                translate([20, 0, -prism_height]) zack(c, 1.2, 1 + offset_width, 0);
-                translate([-28, 0, -prism_height]) zack(c, 1.2, 1 + offset_width, 0);
+            if (botton_zipper) {
+                translate([4, 0, -prism_height]) tooth(c, 1.2, 1 + offset_width, 0);
+                translate([-12, 0, -prism_height]) tooth(c, 1.2, 1 + offset_width, 0);
+                translate([20, 0, -prism_height]) tooth(c, 1.2, 1 + offset_width, 0);
+                translate([-28, 0, -prism_height]) tooth(c, 1.2, 1 + offset_width, 0);
             }
         }
     } else {
@@ -198,10 +198,10 @@ module prism_side_with_zack(c, row, col, top_zack, bottom_zack) {
     }
 }
 
-module prism_raw(row, col, top_zack, bottom_zack) {
-    rotate([0,0,90]) prism_side_with_zack(c_prism_r, row, col, top_zack, bottom_zack);
-    rotate([0,0,210]) prism_side_with_zack(c_prism_y, row, col, top_zack, bottom_zack);
-    rotate([0,0,330]) prism_side_with_zack(c_prism_g, row, col, top_zack, bottom_zack);
+module prism_raw(row, col, top_zipper, botton_zipper) {
+    rotate([0,0,90]) prism_side_with_zipper(c_prism_r, row, col, top_zipper, botton_zipper);
+    rotate([0,0,210]) prism_side_with_zipper(c_prism_y, row, col, top_zipper, botton_zipper);
+    rotate([0,0,330]) prism_side_with_zipper(c_prism_g, row, col, top_zipper, botton_zipper);
 
     if (ENABLE_INNER) {
         render() union() {
@@ -224,5 +224,5 @@ module prism(row, col) {
 
 // for ( row = [0:1:1]) for ( col = [-1:1:1]) prism(row, col);
 
-prism_side_with_zack(c_prism_r, 1, 0, false, true);
-// up(prism_height) prism_side_with_zack(c_prism_g, 1, 0, false, true);
+prism_side_with_zipper(c_prism_r, 1, 0, false, true);
+// up(prism_height) prism_side_with_zipper(c_prism_g, 1, 0, false, true);
