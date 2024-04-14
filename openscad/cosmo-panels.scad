@@ -128,10 +128,10 @@ module prism_side(c, row, col) {
         };
     }
 
-    color(c) rotate([90,0,0]) translate([14, axle_offset, -prism_edge_offset]) lego_axle(m=1, tolerance=0.08);
-    color(c) rotate([90,0,0]) translate([-14, axle_offset, -prism_edge_offset]) lego_axle(m=1, tolerance=0.06);
+    color(c) rotate([90,0,0]) translate([14, axle_offset, -prism_edge_offset]) lego_axle(m=1, tolerance=0.04);
+    color(c) rotate([90,0,0]) translate([-14, axle_offset, -prism_edge_offset]) lego_axle(m=1, tolerance=0.04);
     color(c) rotate([90,0,0]) translate([-14, -axle_offset, -prism_edge_offset]) lego_axle(m=1, tolerance=0.04);
-    color(c) rotate([90,0,0]) translate([14, -axle_offset, -prism_edge_offset]) lego_axle(m=1, tolerance=0.02);
+    color(c) rotate([90,0,0]) translate([14, -axle_offset, -prism_edge_offset]) lego_axle(m=1, tolerance=0.04);
 }
 
 
