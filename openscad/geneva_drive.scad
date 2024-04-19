@@ -10,8 +10,8 @@ include <gears/lego_gears.scad>
 
 driven_slot_quantity = 6;
 target_center_distance = 5 * 8;
-
 drive_pin_diameter = 4;
+
 allowed_clearance = 0.2;
 
 drive_crank_radius = target_center_distance * sin(180 / driven_slot_quantity);
@@ -44,11 +44,11 @@ module drive_wheel() {
 
 module driven_wheel() {
     up(8) difference() {
-        cylinder(h = 8, r = driven_wheel_radius - allowed_clearance);
+        cylinder(h = 8, r = driven_wheel_radius - allowed_clearance - 1);
 
         for (r = [0:360/driven_slot_quantity:360]) rotate([0,0,r])
             right(driven_wheel_radius - slot_center_length / 2) up(4)
-            cube([slot_center_length, drive_pin_diameter, 9], center=true);
+            rotate([0,90,0]) linear_extrude(height = slot_center_length, scale=1.1, center = true) square(size = [9, drive_pin_diameter], center = true);;
 
         for (r = [0:360/driven_slot_quantity:360]) rotate([0,0,r])
             right(driven_wheel_radius - slot_center_length) up(-0.5)
@@ -61,6 +61,8 @@ module driven_wheel() {
     };
 
     cylinder(h = 16, r = 5);
+
+    // up(20) right(driven_wheel_radius) cylinder(h = 9, r = drive_pin_diameter);
 }
 
 module drive_wheel_with_axle() {
@@ -94,8 +96,31 @@ module hole_test() {
     }
 }
 
-color("#ff8888") drive_wheel_with_axle();
-color("#33ff33") left(center_distance) driven_wheel_with_axle();
+start_angle = acos(drive_crank_radius / center_distance);
+echo(start_angle=start_angle);
+
+stop_angle = 180 / driven_slot_quantity;
+
+function geneva_rotate(gamma) =
+    let(a=center_distance)
+    let(b=drive_crank_radius)
+    gamma == 0
+    ? 0
+    : gamma > 0 && gamma <= start_angle
+        ? let(c=sqrt((a*a + b*b) - (2*a*b * cos(gamma)))) asin(sin(gamma) * b / c)
+        : gamma < 0 && gamma >= -start_angle
+            ? let(c=sqrt((a*a + b*b) - (2*a*b * cos(gamma)))) asin(sin(gamma) * b / c)
+            : gamma < 0
+                ? -stop_angle
+                : stop_angle;
+
+rot = $t * 360 - 180;
+rot = 6;
+
+echo(gr = geneva_rotate(rot));
+
+color("#ff8888") rotate([0, 0, rot])  drive_wheel_with_axle();
+color("#33ff33") left(center_distance) rotate([0, 0, -geneva_rotate(rot)])  driven_wheel_with_axle();
 
 // drive_wheel_with_axle();
 // left(drive_crank_radius + driven_wheel_radius + 10) up(16) rotate([0, 180, 0]) driven_wheel_with_axle();
