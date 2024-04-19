@@ -104,18 +104,14 @@ stop_angle = 180 / driven_slot_quantity;
 function geneva_rotate(gamma) =
     let(a=center_distance)
     let(b=drive_crank_radius)
-    gamma == 0
-    ? 0
-    : gamma > 0 && gamma <= start_angle
+    gamma > -start_angle && gamma <= start_angle
         ? let(c=sqrt((a*a + b*b) - (2*a*b * cos(gamma)))) asin(sin(gamma) * b / c)
-        : gamma < 0 && gamma >= -start_angle
-            ? let(c=sqrt((a*a + b*b) - (2*a*b * cos(gamma)))) asin(sin(gamma) * b / c)
-            : gamma < 0
-                ? -stop_angle
-                : stop_angle;
+        : gamma < 0
+            ? -stop_angle
+            : stop_angle;
 
 rot = $t * 360 - 180;
-rot = 6;
+rot = 0;
 
 echo(gr = geneva_rotate(rot));
 
