@@ -8,10 +8,10 @@ include <gears/lego_gears.scad>
 
 // helper_radius = drive_wheel_radius + driven_wheel_radius - driven_wheel_shaft_radius;
 
-driven_slot_quantity = 3;
-target_center_distance = 72;
+driven_slot_quantity = 6;
+target_center_distance = 5 * 8;
 
-drive_pin_diameter = 8;
+drive_pin_diameter = 4;
 allowed_clearance = 0.2;
 
 drive_crank_radius = target_center_distance * sin(180 / driven_slot_quantity);
@@ -67,7 +67,7 @@ module drive_wheel_with_axle() {
     difference() {
         drive_wheel();
 
-        up(-0.5) lego_axle(m=3);
+        up(-0.5) lego_axle(m=3, hole=true, tolerance=0.25);
     }
 }
 
@@ -75,7 +75,22 @@ module driven_wheel_with_axle() {
     difference() {
         driven_wheel();
 
-        up(-0.5) lego_axle(m=3, hole=true);
+        up(-0.5) lego_axle(m=3, hole=true, tolerance=0.25);
+    }
+}
+
+module hole_test() {
+    up(3) difference() {
+        cube([76, 10, 6], center=true);
+        left (-32) up(-4.5) lego_axle(m=3, hole=true, tolerance=0.05);
+        left(-24) up(-4.5) lego_axle(m=3, hole=true, tolerance=0.1);
+        left (-16) up(-4.5) lego_axle(m=3, hole=true, tolerance=0.15);
+        left (-8) up(-4.5) lego_axle(m=3, hole=true, tolerance=0.2);
+        left (0) up(-4.5) lego_axle(m=3, hole=true, tolerance=0.25);
+        left (8) up(-4.5) lego_axle(m=3, hole=true, tolerance=0.3);
+        left (16) up(-4.5) lego_axle(m=3, hole=true, tolerance=0.35);
+        left (24) up(-4.5) lego_axle(m=3, hole=true, tolerance=0.4);
+        left (32) up(-4.5) lego_axle(m=3, hole=true, tolerance=0.45);
     }
 }
 
@@ -83,4 +98,6 @@ color("#ff8888") drive_wheel_with_axle();
 color("#33ff33") left(center_distance) driven_wheel_with_axle();
 
 // drive_wheel_with_axle();
-// left(drive_crank_radius + driven_wheel_radius) up(16) rotate([0, 180, 0]) driven_wheel_with_axle();
+// left(drive_crank_radius + driven_wheel_radius + 10) up(16) rotate([0, 180, 0]) driven_wheel_with_axle();
+
+// left(drive_crank_radius + driven_wheel_radius) back(42) hole_test();
