@@ -1,9 +1,10 @@
 include <BOSL2/std.scad>
 include <gears/lego_gears.scad>
+include <geneva_drive.scad>
 
 prism_radius = 40;
-prism_height = 8 * 11;
-prism_axle_offset = 8 * 3;
+prism_height = 8 * 31;
+prism_axle_offset = 8 * 2;
 prism_size = 1.99;
 
 angle = 16.785;
@@ -14,6 +15,9 @@ prism_edge_inner = prism_radius * prism_factor;
 prism_edge_outer = prism_radius * prism_size;
 prism_edge_height = (prism_size - prism_factor) * prism_radius * sin(angle);
 prism_edge_offset = prism_factor * prism_radius * sin(angle);
+
+echo(prism_height=prism_height);
+echo(prism_edge_outer=prism_edge_outer);
 
 c_prism_r = "#E60000";
 c_prism_y = "#E6E600";
@@ -26,8 +30,9 @@ c_axle = "#555555";
 
 ENABLE_INNER = false;
 ENABLE_ZIPPER = false;
-ENABLE_SIGN_INSET = true;
-ENABLE_SIGN = false;
+ENABLE_SIGN_INSET = false;
+ENABLE_SIGN = true;
+ENABLE_GEARS = false;
 
 module outer_part_1() {
     offset = 5.1;
@@ -42,7 +47,7 @@ module outer_part_1() {
 }
 
 module outer_part() {
-    color(c_outer_part) difference() {
+    color(c_outer_part) render() difference() {
         union() {
             rotate([0,0,90])  outer_part_1();
             rotate([0,0,210])  outer_part_1();
@@ -55,7 +60,7 @@ module outer_part() {
 }
 
 module inner_part() {
-    color(c_inner_part) difference() {
+    color(c_inner_part) render() difference() {
         union() {
             rotate([0,0,90]) rotate([90,0,0]) lego_axle(m=1.5);
             rotate([0,0,90]) rotate([90,0,0]) cylinder(h = 4, r = 3.8);
@@ -84,16 +89,16 @@ module sign(c) {
     }
 
     if (c == c_prism_y) {
-        right(40) import("panel-middle.svg", center=true);
+        right(43.8) import("panel-middle.svg", center=true);
     }
 
     if (c == c_prism_g) {
-        right(40) scale(0.58) import("panel-opened.svg", center=true);
+        fwd(0.8) right(20.3) import("panel-opened.svg", center=true);
     }
 }
 
 module sign_offset(c, row, col) {
-    scale = 0.21;
+    scale = 0.72;
 
     offset_x = col * -prism_edge_outer;
     offset_y = (row + 0.5) * -prism_height + prism_height / 2;
@@ -102,6 +107,7 @@ module sign_offset(c, row, col) {
 }
 
 module prism_side(c, row, col) {
+    prism_side_clearance = 0.1;
     axle_offset = (prism_height / 2) - 4 - prism_axle_offset;
     scale = 0.09;
 
@@ -109,21 +115,21 @@ module prism_side(c, row, col) {
         color(c) render() difference() {
             up(-prism_height / 2) linear_extrude(height=prism_height)
                 translate([0, prism_edge_offset + prism_edge_height / 2, 0])
-                trapezoid(h=prism_edge_height,w1=prism_edge_inner,w2=prism_edge_outer);
+                trapezoid(h=prism_edge_height,w1=prism_edge_inner - prism_side_clearance, w2=prism_edge_outer - prism_side_clearance);
 
             sign_offset(c, row, col);
         };
     } else {
         color(c) up(-prism_height / 2) linear_extrude(height=prism_height)
             translate([0, prism_edge_offset + prism_edge_height / 2, 0])
-            trapezoid(h=prism_edge_height,w1=prism_edge_inner,w2=prism_edge_outer);
+            trapezoid(h=prism_edge_height,w1=prism_edge_inner - prism_side_clearance, w2=prism_edge_outer - prism_side_clearance);
     }
 
     if (ENABLE_SIGN) {
-        color(c_sign) render() intersection() {
+        color(c_sign) back(1) render() intersection() {
             up(-prism_height / 2) linear_extrude(height=prism_height)
                     translate([0, prism_edge_offset + prism_edge_height / 2, 0])
-                    trapezoid(h=prism_edge_height,w1=prism_edge_inner,w2=prism_edge_outer);
+                    trapezoid(h=prism_edge_height, w1=prism_edge_inner - prism_side_clearance, w2=prism_edge_outer - prism_side_clearance);
 
             sign_offset(c, row, col);
         };
@@ -131,6 +137,10 @@ module prism_side(c, row, col) {
 
     color(c) rotate([90,0,0]) translate([14, axle_offset, -prism_edge_offset]) lego_axle(m=1, tolerance=0.04);
     color(c) rotate([90,0,0]) translate([-14, axle_offset, -prism_edge_offset]) lego_axle(m=1, tolerance=0.04);
+
+    color(c) rotate([90,0,0]) translate([-14, 0, -prism_edge_offset]) lego_axle(m=1, tolerance=0.04);
+    color(c) rotate([90,0,0]) translate([14, 0, -prism_edge_offset]) lego_axle(m=1, tolerance=0.04);
+
     color(c) rotate([90,0,0]) translate([-14, -axle_offset, -prism_edge_offset]) lego_axle(m=1, tolerance=0.04);
     color(c) rotate([90,0,0]) translate([14, -axle_offset, -prism_edge_offset]) lego_axle(m=1, tolerance=0.04);
 }
@@ -205,25 +215,52 @@ module prism_raw(row, col, top_zipper, botton_zipper) {
     rotate([0,0,330]) prism_side_with_zipper(c_prism_g, row, col, top_zipper, botton_zipper);
 
     if (ENABLE_INNER) {
-        render() union() {
+        union() {
             up (16) cross_part();
             up (-16) cross_part();
         }
-        down(28) color(c_axle) lego_axle(m=7);
+        down(prism_height / 2 + 24) color(c_axle) lego_axle(m=14);
     }
 }
 
 module prism(row, col) {
-    offset=2*col;
-
     if (row == 0) {
-        back(offset * prism_radius) prism_raw(row, col, true, false);
+        prism_raw(row, col, true, false);
     } else {
-        up(prism_height) back(offset * prism_radius) prism_raw(row, col, false, true);
+        up(prism_height) prism_raw(row, col, false, true);
     }
 }
 
-// for ( row = [0:1:0]) for ( col = [-1:1:1]) prism(row, col);
+// rot = $t * 2160;
 
-prism_side_with_zipper(c_prism_g, 0, -1, false, false);
+rot = 2 * 720;
+// rot = 1 * 720;
+// rot = 2 * 720;
+
+module geneva() {
+    color("#ff8888") rotate([0, 0, rot])
+        drive_wheel_with_axle();
+    color("#33ff33") left(center_distance)
+        rotate([0, 0, -geneva_rotate(rot)])
+        driven_wheel_with_axle();
+}
+
+module column(col) {
+    offset=2*col;
+
+    for ( row = [0:1:0]) back(offset * prism_radius)
+        rotate([0, 0, -geneva_rotate(rot)])
+        prism(row, col);
+
+    if (ENABLE_GEARS) {
+        back(offset * prism_radius) down(prism_height / 2 + 24) back(center_distance) rotate([0,0,90]) geneva();
+    }
+}
+
+for ( col = [-2:1:2]) column(col);
+
+// prism(0, 0);
+
+// $fn = 360;
+// prism_side_with_zipper(c_prism_g, 0, 0, false, false);
 // up(prism_height) prism_side_with_zipper(c_prism_g, 1, 0, false, true);
