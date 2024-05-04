@@ -37,4 +37,6 @@ jobs:
         uses: Swatinem/rust-cache@v2
       - name: Run command
         working-directory: ./firmware/ascii-cosmo
-        run: cargo ${{ matrix.action.command }} ${{ matrix.action.args }}
+        run: |
+          cargo install ldproxy
+          cargo ${{ matrix.action.command }} ${{ matrix.action.args }}
