@@ -1,0 +1,3 @@
+[submodule "schematics/esp-rust-board"]
+	path = schematics/esp-rust-board
+	url = https://github.com/esp-rs/esp-rust-board.git
