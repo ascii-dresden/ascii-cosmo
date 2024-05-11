@@ -38,6 +38,9 @@ jobs:
         uses: Swatinem/rust-cache@v2
       - name: Run command
         working-directory: ./firmware/ascii-cosmo
+        env:
+          COSMO_WIFI_SSID: ssid
+          COSMO_WIFI_PASSWORD: password
         run: |
           cargo install ldproxy
           cargo ${{ matrix.action.command }} ${{ matrix.action.args }}
