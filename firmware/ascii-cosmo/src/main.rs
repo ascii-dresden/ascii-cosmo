@@ -15,7 +15,7 @@ fn main() {
     let mut button = PinDriver::input(peripherals.pins.gpio4).expect("Failed to create button driver");
     button.set_pull(Pull::Down).unwrap();
     loop {
-        led.set_level(button.get_level());
+        led.set_level(button.get_level()).unwrap();
         FreeRtos::delay_ms(50);
     }
 }
