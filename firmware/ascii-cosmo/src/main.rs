@@ -1,10 +1,17 @@
 use embedded_svc::wifi::{ClientConfiguration, Configuration as WifiConfiguration};
+use embedded_svc::{http::Method, io::Write};
 use esp_idf_hal::{
     delay::FreeRtos,
     gpio::{PinDriver, Pull},
     peripherals::Peripherals,
 };
-use esp_idf_svc::{eventloop::EspSystemEventLoop, nvs::EspDefaultNvsPartition, wifi::EspWifi};
+use esp_idf_svc::{
+    eventloop::EspSystemEventLoop,
+    http::server::{Configuration, EspHttpServer},
+    nvs::EspDefaultNvsPartition,
+    sys::EspError,
+    wifi::EspWifi,
+};
 use heapless::String;
 
 fn main() {
@@ -45,6 +52,25 @@ fn main() {
 
     wifi_driver.start().expect("Failed to start wifi");
     wifi_driver.connect().expect("Failed to connect to wifi");
+
+    while !wifi_driver.is_connected().unwrap() {
+        FreeRtos::delay_ms(1000);
+        log::info!("Waiting for connection...");
+    }
+
+    let mut server =
+        EspHttpServer::new(&Configuration::default()).expect("Failed to create webserver");
+    server
+        .fn_handler("/", Method::Get, move |request| {
+            let mut response = request
+                .into_ok_response()
+                .expect("Failed to create response");
+            response
+                .write_all("Hello World!".as_bytes())
+                .expect("Failed to send response");
+            Ok::<(), EspError>(())
+        })
+        .expect("Failed to handle request");
 
     loop {
         led.set_level(button.get_level()).unwrap();
