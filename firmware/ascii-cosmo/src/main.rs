@@ -1,4 +1,4 @@
-use esp_idf_hal::{delay::FreeRtos, gpio::PinDriver, peripherals::Peripherals};
+use esp_idf_hal::{delay::FreeRtos, gpio::{InterruptType, PinDriver, Pull}, peripherals::Peripherals};
 
 fn main() {
     // It is necessary to call this function once. Otherwise some patches to the runtime
@@ -12,8 +12,10 @@ fn main() {
 
     let peripherals = Peripherals::take().expect("Failed to take peripherals");
     let mut led = PinDriver::output(peripherals.pins.gpio9).expect("Failed to create led driver");
+    let mut button = PinDriver::input(peripherals.pins.gpio4).expect("Failed to create button driver");
+    button.set_pull(Pull::Down).unwrap();
     loop {
-        led.toggle().expect("Failed to toggle led");
-        FreeRtos::delay_ms(500);
+        led.set_level(button.get_level());
+        FreeRtos::delay_ms(50);
     }
 }
