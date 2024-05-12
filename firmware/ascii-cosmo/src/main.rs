@@ -13,6 +13,9 @@ use esp_idf_svc::{
     wifi::EspWifi,
 };
 use heapless::String;
+use std::sync::atomic::{AtomicBool, Ordering};
+
+static SENSOR_STATE: AtomicBool = AtomicBool::new(false);
 
 fn main() {
     // It is necessary to call this function once. Otherwise some patches to the runtime
@@ -25,10 +28,11 @@ fn main() {
     log::info!("Hello, world!");
 
     let peripherals = Peripherals::take().expect("Failed to take peripherals");
-    let mut led = PinDriver::output(peripherals.pins.gpio9).expect("Failed to create led driver");
-    let mut button =
-        PinDriver::input(peripherals.pins.gpio4).expect("Failed to create button driver");
-    button.set_pull(Pull::Down).unwrap();
+    let mut led = PinDriver::output(peripherals.pins.gpio7).expect("Failed to create led driver");
+    led.set_high().expect("Failed to set led high");
+    let mut sensor =
+        PinDriver::input(peripherals.pins.gpio4).expect("Failed to create sensor driver");
+    sensor.set_pull(Pull::Down).unwrap();
 
     let sysloop = EspSystemEventLoop::take().expect("Failed to take sysloop");
     let nvs = EspDefaultNvsPartition::take().expect("Failed to take nvs");
@@ -62,18 +66,22 @@ fn main() {
         EspHttpServer::new(&Configuration::default()).expect("Failed to create webserver");
     server
         .fn_handler("/", Method::Get, move |request| {
+            let state = SENSOR_STATE.load(Ordering::Relaxed);
             let mut response = request
                 .into_ok_response()
                 .expect("Failed to create response");
             response
-                .write_all("Hello World!".as_bytes())
+                .write_all(format!("State: {state}").as_bytes())
                 .expect("Failed to send response");
             Ok::<(), EspError>(())
         })
         .expect("Failed to handle request");
 
+    led.set_low().expect("Failed to set led low");
     loop {
-        led.set_level(button.get_level()).unwrap();
+        let level = sensor.get_level();
+        SENSOR_STATE.store(bool::from(level), Ordering::Relaxed);
+        led.set_level(level).unwrap();
         FreeRtos::delay_ms(50);
     }
 }
