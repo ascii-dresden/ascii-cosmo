@@ -29,6 +29,11 @@ fn main() {
 
     let peripherals = Peripherals::take().expect("Failed to take peripherals");
     let mut led = PinDriver::output(peripherals.pins.gpio7).expect("Failed to create led driver");
+    let mut motor = PinDriver::output(peripherals.pins.gpio6).expect("Failed to create motor1");
+    let mut motor_sleep =
+        PinDriver::output(peripherals.pins.gpio5).expect("Failed to create motor2");
+    motor.set_low().unwrap();
+    motor_sleep.set_low().unwrap();
     led.set_high().expect("Failed to set led high");
     let mut sensor =
         PinDriver::input(peripherals.pins.gpio4).expect("Failed to create sensor driver");
@@ -77,11 +82,13 @@ fn main() {
         })
         .expect("Failed to handle request");
 
+    motor_sleep.set_high().unwrap();
     led.set_low().expect("Failed to set led low");
     loop {
         let level = sensor.get_level();
         SENSOR_STATE.store(bool::from(level), Ordering::Relaxed);
         led.set_level(level).unwrap();
+        motor.set_level(level).unwrap();
         FreeRtos::delay_ms(50);
     }
 }
