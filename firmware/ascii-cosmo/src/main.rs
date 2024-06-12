@@ -3,8 +3,11 @@ use embedded_svc::{http::Method, io::Write};
 use esp_idf_hal::{
     delay::FreeRtos,
     gpio::{PinDriver, Pull},
+    ledc::{config::TimerConfig, LedcDriver, LedcTimerDriver},
     peripherals::Peripherals,
+    units::*,
 };
+
 use esp_idf_svc::{
     eventloop::EspSystemEventLoop,
     http::server::{Configuration, EspHttpServer},
@@ -29,15 +32,25 @@ fn main() {
 
     let peripherals = Peripherals::take().expect("Failed to take peripherals");
     let mut led = PinDriver::output(peripherals.pins.gpio7).expect("Failed to create led driver");
-    let mut motor = PinDriver::output(peripherals.pins.gpio6).expect("Failed to create motor1");
     let mut motor_sleep =
-        PinDriver::output(peripherals.pins.gpio5).expect("Failed to create motor2");
-    motor.set_low().unwrap();
+        PinDriver::output(peripherals.pins.gpio5).expect("Failed to create motor sleep driver");
     motor_sleep.set_low().unwrap();
     led.set_high().expect("Failed to set led high");
     let mut sensor =
         PinDriver::input(peripherals.pins.gpio4).expect("Failed to create sensor driver");
     sensor.set_pull(Pull::Down).unwrap();
+
+    let timer_driver = LedcTimerDriver::new(
+        peripherals.ledc.timer0,
+        &TimerConfig::default().frequency(5.kHz().into()),
+    )
+    .expect("Failed to create LED timer driver");
+    let mut motor = LedcDriver::new(
+        peripherals.ledc.channel0,
+        timer_driver,
+        peripherals.pins.gpio6,
+    )
+    .expect("Failed to create LED driver");
 
     let sysloop = EspSystemEventLoop::take().expect("Failed to take sysloop");
     let nvs = EspDefaultNvsPartition::take().expect("Failed to take nvs");
@@ -82,13 +95,14 @@ fn main() {
         })
         .expect("Failed to handle request");
 
-    motor_sleep.set_high().unwrap();
+    let max_duty = motor.get_max_duty();
+    motor.set_duty(max_duty / 2).unwrap();
     led.set_low().expect("Failed to set led low");
     loop {
         let level = sensor.get_level();
         SENSOR_STATE.store(bool::from(level), Ordering::Relaxed);
         led.set_level(level).unwrap();
-        motor.set_level(level).unwrap();
+        motor_sleep.set_level(level).unwrap();
         FreeRtos::delay_ms(50);
     }
 }
