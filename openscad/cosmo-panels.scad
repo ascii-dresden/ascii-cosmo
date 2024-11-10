@@ -135,14 +135,14 @@ module prism_side(c, row, col) {
         };
     }
 
-    color(c) rotate([90,0,0]) translate([14, axle_offset, -prism_edge_offset]) lego_axle(m=1, tolerance=0.04);
-    color(c) rotate([90,0,0]) translate([-14, axle_offset, -prism_edge_offset]) lego_axle(m=1, tolerance=0.04);
+    color(c) rotate([90,0,0]) translate([14, axle_offset, -prism_edge_offset]) lego_axle(m=0.7, tolerance=0.04);
+    color(c) rotate([90,0,0]) translate([-14, axle_offset, -prism_edge_offset]) lego_axle(m=0.7, tolerance=0.04);
 
-    color(c) rotate([90,0,0]) translate([-14, 0, -prism_edge_offset]) lego_axle(m=1, tolerance=0.04);
-    color(c) rotate([90,0,0]) translate([14, 0, -prism_edge_offset]) lego_axle(m=1, tolerance=0.04);
+    color(c) rotate([90,0,0]) translate([-14, 0, -prism_edge_offset]) lego_axle(m=0.7, tolerance=0.04);
+    color(c) rotate([90,0,0]) translate([14, 0, -prism_edge_offset]) lego_axle(m=0.7, tolerance=0.04);
 
-    color(c) rotate([90,0,0]) translate([-14, -axle_offset, -prism_edge_offset]) lego_axle(m=1, tolerance=0.04);
-    color(c) rotate([90,0,0]) translate([14, -axle_offset, -prism_edge_offset]) lego_axle(m=1, tolerance=0.04);
+    color(c) rotate([90,0,0]) translate([-14, -axle_offset, -prism_edge_offset]) lego_axle(m=0.7, tolerance=0.04);
+    color(c) rotate([90,0,0]) translate([14, -axle_offset, -prism_edge_offset]) lego_axle(m=0.7, tolerance=0.04);
 }
 
 
@@ -257,10 +257,28 @@ module column(col) {
     }
 }
 
-for ( col = [-2:1:2]) column(col);
+// for ( col = [-2:1:2]) column(col);
 
 // prism(0, 0);
 
 // $fn = 360;
-// prism_side_with_zipper(c_prism_g, 0, 0, false, false);
+// prism_side_with_zipper(c_prism_g, 0, -2, false, false);
 // up(prism_height) prism_side_with_zipper(c_prism_g, 1, 0, false, true);
+
+// for ( col = [-2:1:2])
+//     up(prism_height)
+//     right(2 * col * prism_radius)
+//     prism_side_with_zipper(c_prism_r, 0, col, false, false);
+
+// for ( col = [-2:1:2])
+//     right(2 * col * prism_radius)
+//     prism_side_with_zipper(c_prism_y, 0, col, false, false);
+
+// for ( col = [-2:1:2])
+//     down(prism_height)
+//     right(2 * col * prism_radius)
+//     prism_side_with_zipper(c_prism_g, 0, col, false, false);
+
+// $vpt = [0, 0, 0];
+// $vpr = [90, 0, 180];
+// $vpd = 1800;
