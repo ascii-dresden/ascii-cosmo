@@ -111,6 +111,22 @@ module driven_wheel_with_axle() {
     }
 }
 
+module drive_wheel_with_axle_and_marking() {
+    difference() {
+        drive_wheel_with_axle();
+
+        right(3.5) fwd(4) down(1 - 0.05) cube([17,8,1]);
+    }
+}
+
+module driven_wheel_with_axle_and_marking() {
+    difference() {
+        driven_wheel_with_axle();
+        
+        right(5) fwd(4) down(-7 - 0.05) cube([18,8,1]);
+    }
+}
+
 geneva_rotate_offset_angle = acos(drive_crank_radius / center_distance);
 geneva_rotate_start_angle = 180 - geneva_rotate_offset_angle;
 geneva_rotate_end_angle = 180 + geneva_rotate_offset_angle;
@@ -131,19 +147,19 @@ function geneva_rotate(gamma) =
 module sample() {
     rot = $t * 1080;
 
-    color("#ff8888") rotate([0, 0, rot])  drive_wheel_with_axle();
+    color("#ff8888") rotate([0, 0, rot]) drive_wheel_with_axle_and_marking();
     color("#33ff33") left(center_distance)
         rotate([0, 0, -geneva_rotate(rot)])
-        driven_wheel_with_axle();
+        driven_wheel_with_axle_and_marking();
 }
 
 module print() {
     $fn = 360;
-    drive_wheel_with_axle();
+    drive_wheel_with_axle_and_marking();
     left(drive_crank_radius + driven_wheel_radius + 10) up(16)
         rotate([0, 180, 0])
-        driven_wheel_with_axle();
+        driven_wheel_with_axle_and_marking();
 }
 
-sample();
-// print();
+// sample();
+print();
